@@ -27,7 +27,11 @@ module.exports.editPost = async (req, res) => {
   const post = await PostModel.findById(req.params.id);
 
   if (!post) {
-    req.status(400).json({ message: "Ce post n'existe pas" });
+    return res.status(404).json({ message: "Ce post n'existe pas" });
+  }
+
+  if (req.auth.user._id !== post.authorId) {
+    return res.status(401).json({ message: "Vous n'êtes pas l'auteur de ce post" });
   }
 
   const updatePost = await PostModel.findByIdAndUpdate(
@@ -43,7 +47,11 @@ module.exports.deletePost = async (req, res) => {
   const post = await PostModel.findById(req.params.id);
 
   if (!post) {
-    req.status(400).json({ message: "Ce post n'existe pas" });
+    return res.status(404).json({ message: "Ce post n'existe pas" });
+  }
+
+  if (req.auth.user._id !== post.authorId) {
+    return res.status(401).json({ message: "Vous n'êtes pas l'auteur de ce post" });
   }
 
   await PostModel.findByIdAndDelete(req.params.id);

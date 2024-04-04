@@ -12,6 +12,8 @@ export default function App({ isAuth, setIsAuth }) {
   // scrollToBottom
   const scrollViewRef = useRef();
   const [userData, setUserData] = useState({});
+  const [handleEdit, setHandleEdit] = useState(false);
+  const [idToModify, setIdToModify] = useState("");
 
   useEffect(() => {
     const auth_token = sessionStorage.getItem("auth_token");
@@ -24,18 +26,35 @@ export default function App({ isAuth, setIsAuth }) {
       }
     })
     .then((response) => setUserData(response.data))
+    .catch((err) => {
+      console.error(err);
+
+      // On déconnecte l'utilisateur
+      sessionStorage.setItem("isAuth", false);
+      setIsAuth(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    const auth_token = sessionStorage.getItem("auth_token");
 
     // On récupère la totalité des posts,
     axios
-      .get("http://192.168.1.27:3000/posts", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-        }
-      })
-      .then((response) => setPosts(response.data))  // et on les assigne à la state : posts
-      .catch((err) => console.error(err))
-  }, [])
+    .get("http://192.168.1.27:3000/posts", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
+      }
+    })
+    .then((response) => setPosts(response.data))  // et on les assigne à la state : posts
+    .catch((err) => {
+      console.error(err);
+
+      // On déconnecte l'utilisateur
+      sessionStorage.setItem("isAuth", false);
+      setIsAuth(false);
+    });
+  }, []);
 
   // scrollToBottom
   useEffect(() => {
@@ -47,8 +66,9 @@ export default function App({ isAuth, setIsAuth }) {
   const handlePost = () => {
     const auth_token = sessionStorage.getItem("auth_token");
 
-    // On transmet le message envoyé au BACK
-    axios
+    try {
+      // On transmet le message envoyé au BACK
+      axios
       .post("http://192.168.1.27:3000/posts",
       {
         message: msgContent,  // contenu du message
@@ -61,10 +81,71 @@ export default function App({ isAuth, setIsAuth }) {
         }
       })
       .catch((err) => console.error(err));
+    } catch (err) {
+      console.error(err);
+
+      // On déconnecte l'utilisateur
+      sessionStorage.setItem("isAuth", false);
+      setIsAuth(false);
+    };
 
     // On recharge la page afin d'afficher le nouveau post
     window.location.reload();
+  };
+
+  const preEdit = (postId, postMessage) => {
+    setHandleEdit(true);
+    setIdToModify(postId);
+    setMsgContent(postMessage);
   }
+
+  const handlePut = () => {
+    const auth_token = sessionStorage.getItem("auth_token");
+
+    try {
+      axios
+      .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
+        message: msgContent,  // contenu du message
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
+        }
+      })
+      .catch((err) => console.warn(err.response.data.message));
+    } catch (err) {
+      console.error(err);
+
+      // On déconnecte l'utilisateur
+      sessionStorage.setItem("isAuth", false);
+      setIsAuth(false);
+    }
+    
+    window.location.reload();
+  };
+
+  const handleDelete = (postId) => {
+    const auth_token = sessionStorage.getItem("auth_token");
+
+    try {
+      axios
+      .delete(`http://192.168.1.27:3000/posts/${postId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
+        }
+      })
+      .catch((err) => console.warn(err.response.data.message));
+    } catch (err) {
+      console.error(err);
+
+      // On déconnecte l'utilisateur
+      sessionStorage.setItem("isAuth", false);
+      setIsAuth(false);
+    }
+
+    window.location.reload();
+  };
 
   return (
     <View style={styles.container}>
@@ -87,7 +168,7 @@ export default function App({ isAuth, setIsAuth }) {
       >
         {/* On affiche la totalité des posts */}
         {posts.map((message) => (
-          <Message key={message._id} id={message._id} post={message} userData={userData} />
+          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} />
         ))}
       </ScrollView>
       {/* "Formulaire" de création d'un post */}
@@ -99,11 +180,19 @@ export default function App({ isAuth, setIsAuth }) {
           onChange={(e) => setMsgContent(e.target.value)}
           // ------------------
         />
-        <Button
-          color={"#FF6C37"}
-          title="Envoyer"
-          onPress={() => handlePost()}
-        />
+        {!handleEdit ? (
+          <Button
+            color={"#FF6C37"}
+            title="Envoyer"
+            onPress={() => handlePost()}
+          />
+        ) : (
+          <Button
+            color={"#FF6C37"}
+            title="Enregistrer"
+            onPress={() => handlePut()}
+          />
+        )}
       </View>
     </View>
   );
