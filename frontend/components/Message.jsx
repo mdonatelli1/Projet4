@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
-export default function Message({ post, userData, handleModif, handleDelete }) {
+export default function Message({ post, userData, handleModif, handleDelete, isAuth, setIsAuth, auth_token }) {
   // const [deleted, setDeleted] = useState(false);
   // fav = true si le post est liké, sinon, fav = false
   const [fav, setFav] = useState(false);
@@ -18,8 +18,6 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
 
   // handleFav permet de liker ou de disliker le post en fonction de la valeur de la state : fav
   const handleFav = async () => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
     try {
       if (fav) {
         // Si le post est liké,
@@ -52,7 +50,6 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
       setIsAuth(false);
     }
 
@@ -133,22 +130,22 @@ const styles = StyleSheet.create({
   messageHeader: {
     display: "flex",
     flexDirection: "row",
-    gap: "10px",
+    gap: 10,
     alignItems: "center"
   },
   author: {
-    fontSize: "0.75rem",
+    fontSize: 12,
     color: "#FF6C37"
   },
   logo: {
     height: "8px",
     width: "8px",
-    cursor: "pointer"
+    // cursor: "pointer"
   },
   messageContent: {
     backgroundColor: "#FFFFFF",
     border: "solid 1px #FF6C37",
-    borderRadius: "10px",
+    // borderRadius: "10px",
     marginTop: "2.5px",
     marginBottom: "2.5px",
     padding: "10px"
@@ -158,7 +155,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: "32px",
     bottom: 0,
-    transform: "translate(50%, 100%)"
+    transform: [{ translateX: 16 }, { translateY: 16 }]
   },
   fav: {
     height: "16px",
@@ -166,10 +163,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
     bottom: 0,
-    transform: "translate(50%, 50%)"
+    transform: [{ translateX: 8 }, { translateY: 8 }]
   },
   datetime: {
-    fontSize: "0.5rem",
+    fontSize: 8,
     color: "#FF6C37"
   }
 });

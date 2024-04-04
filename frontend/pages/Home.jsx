@@ -4,7 +4,7 @@ import { Button, Image, ScrollView, StyleSheet, TextInput, View } from 'react-na
 
 import Message from "../components/Message.jsx";
 
-export default function App({ isAuth, setIsAuth }) {
+export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
   // msgContent contiendra le contenu du message à envoyer
   const [msgContent, setMsgContent] = useState("");
   // posts contiendra la totalité des posts
@@ -16,9 +16,7 @@ export default function App({ isAuth, setIsAuth }) {
   const [idToModify, setIdToModify] = useState("");
 
   useEffect(() => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
-    axios
+  axios
     .get(`http://192.168.1.27:3000/users/me`, {
       headers: {
         "Content-Type": "application/json",
@@ -30,14 +28,12 @@ export default function App({ isAuth, setIsAuth }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
+      // sessionStorage.setItem("isAuth", false);
       setIsAuth(false);
     });
   }, []);
 
   useEffect(() => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
     // On récupère la totalité des posts,
     axios
     .get("http://192.168.1.27:3000/posts", {
@@ -51,7 +47,7 @@ export default function App({ isAuth, setIsAuth }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
+      // sessionStorage.setItem("isAuth", false);
       setIsAuth(false);
     });
   }, []);
@@ -64,8 +60,6 @@ export default function App({ isAuth, setIsAuth }) {
 
   // handlePost permet de transmettre au BACK le message envoyé
   const handlePost = () => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
     try {
       // On transmet le message envoyé au BACK
       axios
@@ -85,7 +79,7 @@ export default function App({ isAuth, setIsAuth }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
+      // sessionStorage.setItem("isAuth", false);
       setIsAuth(false);
     };
 
@@ -100,8 +94,6 @@ export default function App({ isAuth, setIsAuth }) {
   }
 
   const handlePut = () => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
     try {
       axios
       .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
@@ -117,7 +109,7 @@ export default function App({ isAuth, setIsAuth }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
+      // sessionStorage.setItem("isAuth", false);
       setIsAuth(false);
     }
     
@@ -125,8 +117,6 @@ export default function App({ isAuth, setIsAuth }) {
   };
 
   const handleDelete = (postId) => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
     try {
       axios
       .delete(`http://192.168.1.27:3000/posts/${postId}`, {
@@ -140,7 +130,7 @@ export default function App({ isAuth, setIsAuth }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
+      // sessionStorage.setItem("isAuth", false);
       setIsAuth(false);
     }
 
@@ -154,7 +144,7 @@ export default function App({ isAuth, setIsAuth }) {
         style={styles.logout}
         onClick={() => {
           // On déconnecte l'utilisateur
-          sessionStorage.setItem("isAuth", false)
+          // sessionStorage.setItem("isAuth", false)
           setIsAuth(false);
         }}
         source={require("../assets/images/logout.png")}
@@ -168,7 +158,7 @@ export default function App({ isAuth, setIsAuth }) {
       >
         {/* On affiche la totalité des posts */}
         {posts.map((message) => (
-          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} />
+          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} isAuth={isAuth} setIsAuth={setIsAuth} auth_token={auth_token} />
         ))}
       </ScrollView>
       {/* "Formulaire" de création d'un post */}
@@ -177,7 +167,7 @@ export default function App({ isAuth, setIsAuth }) {
           style={styles.input}
           // composant contrôlé
           value={msgContent}
-          onChange={(e) => setMsgContent(e.target.value)}
+          onChangeText={(e) => setMsgContent(e)}
           // ------------------
         />
         {!handleEdit ? (
@@ -213,7 +203,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     right: 0,
-    cursor: "pointer"
+    // cursor: "pointer"
   },
   messages: {
     flex: 1,
@@ -231,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     color: "#1B1918",
     flex: 0.9,
-    borderRadius: "10px",
+    // borderRadius: "10px",
     padding: "5px"
   }
 });

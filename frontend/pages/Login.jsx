@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
-export default function Login({ isAuth, setIsAuth }) {
+export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
   // errors contiendra la totalité des erreurs du formulaire
   const [errors, setErrors] = useState({});
   // Initialisation des données du formulaire
@@ -22,17 +22,14 @@ export default function Login({ isAuth, setIsAuth }) {
         params: {
           email: formData.email,
           password: formData.password
-        },
-        withCredentials: true,
-        credentials: 'include'
+        }
       })
       .then((response) => {
-        // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
-        sessionStorage.setItem("isAuth", true),
-        setIsAuth(true);
+        setToken(response.data.token);
 
-        // et on ajoute son pseudo au stockage de session
-        sessionStorage.setItem("auth_token", response.data.token);
+        // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
+        // sessionStorage.setItem("isAuth", true),
+        setIsAuth(true);
       })
       .catch((err) => setErrors(err.response.data))
   }
@@ -87,14 +84,24 @@ export default function Login({ isAuth, setIsAuth }) {
             id="email"
             style={styles.input}
             value={formData.email}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  email: e,
+                }))
+            }}
           />
           <Text style={styles.text}>Mot de passe</Text>
           <TextInput
             id="password"
             style={styles.input}
             value={formData.password}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  password: e,
+                }))
+            }}
           />
           <Button
             color={"#FF6C37"}
@@ -120,28 +127,48 @@ export default function Login({ isAuth, setIsAuth }) {
             id="email"
             style={styles.input}
             value={formData.email}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  email: e,
+                }))
+            }}
           />
           <Text style={styles.text}>Mot de passe</Text>
           <TextInput
             id="password"
             style={styles.input}
             value={formData.password}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  password: e,
+                }))
+            }}
           />
           <Text style={styles.text}>Confirmer le mot de passe</Text>
           <TextInput
             id="password2"
             style={styles.input}
             value={formData.password2}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  password2: e,
+                }))
+            }}
           />
           <Text style={styles.text}>Pseudo</Text>
           <TextInput
             id="pseudo"
             style={styles.input}
             value={formData.pseudo}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  pseudo: e,
+                }))
+            }}
           />
           <Button
             color={"#FF6C37"}
@@ -170,7 +197,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "10px"
+    gap: 10
   },
   text: {
     color: "#FFFFFF"
