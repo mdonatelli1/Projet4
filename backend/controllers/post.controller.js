@@ -59,7 +59,6 @@ module.exports.deletePost = async (req, res) => {
 }
 
 module.exports.likePost = async (req, res) => {
-  console.info("coucou")
   try {
     await PostModel.findByIdAndUpdate(
       req.params.id,
@@ -72,7 +71,6 @@ module.exports.likePost = async (req, res) => {
 }
 
 module.exports.dislikePost = async (req, res) => {
-  console.info("coucou")
   try {
     await PostModel.findByIdAndUpdate(
       req.params.id,
