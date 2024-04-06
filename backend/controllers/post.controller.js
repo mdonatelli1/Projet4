@@ -1,61 +1,86 @@
 const PostModel = require('../models/post.model');
 
 module.exports.getPostById = async (req, res) => {
-  const post = await PostModel.findById(req.params.id);
-  res.status(200).json(post);
+  try {
+    const post = await PostModel.findById(req.params.id);
+    res.status(200).json(post);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 }
 
 module.exports.getPosts = async (req, res) => {
-  const posts = await PostModel.find();
-  res.status(200).json(posts);
+  try {
+    const posts = await PostModel.find();
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 };
 
 module.exports.setPost = async (req, res) => {
-  if (!req.body.message) {
-    res.status(400).json({ message: "Merci d'ajouter un message" })
+  try {
+    if (!req.body.message) {
+      res.status(400).json({ message: "Merci d'ajouter un message" })
+    }
+  
+    const post = await PostModel.create({
+      message: req.body.message,
+      authorId: req.body.authorId,
+      authorPseudo: req.body.authorPseudo
+    })
+    res.status(201).json(post);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
-
-  const post = await PostModel.create({
-    message: req.body.message,
-    authorId: req.body.authorId,
-    authorPseudo: req.body.authorPseudo
-  })
-  res.status(200).json(post);
 };
 
 module.exports.editPost = async (req, res) => {
-  const post = await PostModel.findById(req.params.id);
+  try {
+    const post = await PostModel.findById(req.params.id);
 
-  if (!post) {
-    return res.status(404).json({ message: "Ce post n'existe pas" });
+    if (!post) {
+      return res.status(404).json({ message: "Ce post n'existe pas" });
+    }
+  
+    if (req.auth.user._id !== post.authorId) {
+      return res.status(403).json({ message: "Vous n'êtes pas l'auteur de ce post" });
+    }
+  
+    const updatePost = await PostModel.findByIdAndUpdate(
+      post,
+      req.body,
+      { new: true }
+    )
+  
+    res.status(204).json({ updatePost });
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
-
-  if (req.auth.user._id !== post.authorId) {
-    return res.status(401).json({ message: "Vous n'êtes pas l'auteur de ce post" });
-  }
-
-  const updatePost = await PostModel.findByIdAndUpdate(
-    post,
-    req.body,
-    { new: true }
-  )
-
-  res.status(200).json({ updatePost });
 };
 
 module.exports.deletePost = async (req, res) => {
-  const post = await PostModel.findById(req.params.id);
+  try {
+    const post = await PostModel.findById(req.params.id);
 
-  if (!post) {
-    return res.status(404).json({ message: "Ce post n'existe pas" });
+    if (!post) {
+      return res.status(404).json({ message: "Ce post n'existe pas" });
+    }
+  
+    if (req.auth.user._id !== post.authorId) {
+      return res.status(403).json({ message: "Vous n'êtes pas l'auteur de ce post" });
+    }
+  
+    await PostModel.findByIdAndDelete(req.params.id);
+    res.status(200).json( "Message supprimé " + req.params.id);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
-
-  if (req.auth.user._id !== post.authorId) {
-    return res.status(401).json({ message: "Vous n'êtes pas l'auteur de ce post" });
-  }
-
-  await PostModel.findByIdAndDelete(req.params.id);
-  res.status(200).json( "Message supprimé " + req.params.id);
 }
 
 module.exports.likePost = async (req, res) => {
@@ -64,9 +89,11 @@ module.exports.likePost = async (req, res) => {
       req.params.id,
       {$addToSet: { likers: req.body.userId } },
       { new: true }
-    ).then((data) => res.status(200).send(data))
+    )
+
+    res.sendStatus(204);
   } catch (err) {
-    res.status(400).json(err);
+    res.status(500).json(err);
   }
 }
 
@@ -76,8 +103,10 @@ module.exports.dislikePost = async (req, res) => {
       req.params.id,
       {$pull: { likers: req.body.userId } },
       { new: true }
-    ).then((data) => res.status(200).send(data))
+    )
+
+    res.sendStatus(204);
   } catch (err) {
-    res.status(400).json(err);
+    res.status(500).json(err);
   }
 }

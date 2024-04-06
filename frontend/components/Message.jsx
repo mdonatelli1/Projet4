@@ -17,43 +17,47 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
   }, [])
 
   // handleFav permet de liker ou de disliker le post en fonction de la valeur de la state : fav
-  const handleFav = async () => {
+  const handleFav = () => {
     const auth_token = sessionStorage.getItem("auth_token");
 
-    try {
-      if (fav) {
-        // Si le post est liké,
-        axios
-        .patch(`http://192.168.1.27:3000/posts/dislike-post/${post._id}`, { // alors on le dislike,
-          userId: userData._id
-        }, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-          }
-        })
-
+    if (fav) {
+      // Si le post est liké,
+      axios
+      .patch(`http://192.168.1.27:3000/posts/dislike-post/${post._id}`, { // alors on le dislike,
+        userId: userData._id
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
+        }
+      }).then(() => {
         setAmountLikes(amountLikes - 1);
-      } else {
-        // sinon,
-        axios
-        .patch(`http://192.168.1.27:3000/posts/like-post/${post._id}`, {  // on le like
-          userId: userData._id
-        }, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-          }
-        })
+      }).catch((err) => {
+        console.error(err);
 
+        // On déconnecte l'utilisateur
+        sessionStorage.setItem("isAuth", false);
+        setIsAuth(false);
+      })
+    } else {
+      // sinon,
+      axios
+      .patch(`http://192.168.1.27:3000/posts/like-post/${post._id}`, {  // on le like
+        userId: userData._id
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
+        }
+      }).then(() => {
         setAmountLikes(amountLikes + 1);
-      }
-    } catch (err) {
-      console.error(err);
+      }).catch((err) => {
+        console.error(err);
 
-      // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
-      setIsAuth(false);
+        // On déconnecte l'utilisateur
+        sessionStorage.setItem("isAuth", false);
+        setIsAuth(false);
+      })
     }
 
     // On met à jour la state : fav
