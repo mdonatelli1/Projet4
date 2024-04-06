@@ -5,10 +5,10 @@ const { hashPassword, verifyPassword } = require("../helpers/argonHelper");
 const { encodeJWT } = require("../helpers/jwtHelper");
 
 module.exports.loginUser = async (req, res) => {
-  const { email, password } = req.query;
+  const { email, password } = req.body;
 
   // userValidator
-  const errors = validateUserLogin(req.query);
+  const errors = validateUserLogin(req.body);
 
   if (errors) {
     return res.status(401).send(errors);

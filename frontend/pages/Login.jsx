@@ -18,17 +18,16 @@ export default function Login({ isAuth, setIsAuth }) {
   // handleConnect permet de se connecter
   const handleConnect = () => {
     axios
-      .get("http://192.168.1.27:3000/auth/login", {
-        params: {
+      .post("http://192.168.1.27:3000/auth/login", {
           email: formData.email,
           password: formData.password
-        },
+        }, {
         withCredentials: true,
         credentials: 'include'
       })
       .then((response) => {
         // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
-        sessionStorage.setItem("isAuth", true),
+        sessionStorage.setItem("isAuth", true);
         setIsAuth(true);
 
         // et on ajoute son pseudo au stockage de session
