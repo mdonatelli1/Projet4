@@ -26,6 +26,14 @@ module.exports.setPost = async (req, res) => {
       res.status(400).json({ message: "Merci d'ajouter un message" })
     }
   
+    // postValidator
+    const errors = validatePost(req.body);
+
+    if (errors) {
+      return res.status(401).send(errors);
+    }
+    // -------------
+
     const post = await PostModel.create({
       message: req.body.message,
       authorId: req.body.authorId,
@@ -50,6 +58,14 @@ module.exports.editPost = async (req, res) => {
       return res.status(403).json({ message: "Vous n'êtes pas l'auteur de ce post" });
     }
   
+    // postValidator
+    const errors = validatePost(req.body);
+
+    if (errors) {
+      return res.status(401).send(errors);
+    }
+    // -------------
+
     const updatePost = await PostModel.findByIdAndUpdate(
       post,
       req.body,

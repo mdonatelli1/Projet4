@@ -91,6 +91,7 @@ export default function Login({ isAuth, setIsAuth }) {
           <Text style={styles.text}>Mot de passe</Text>
           <TextInput
             id="password"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password}
             onChange={(e) => handleChange(e)}
@@ -124,6 +125,7 @@ export default function Login({ isAuth, setIsAuth }) {
           <Text style={styles.text}>Mot de passe</Text>
           <TextInput
             id="password"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password}
             onChange={(e) => handleChange(e)}
@@ -131,6 +133,7 @@ export default function Login({ isAuth, setIsAuth }) {
           <Text style={styles.text}>Confirmer le mot de passe</Text>
           <TextInput
             id="password2"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password2}
             onChange={(e) => handleChange(e)}

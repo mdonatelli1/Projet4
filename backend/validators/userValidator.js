@@ -4,7 +4,7 @@ const validateUserLogin = (user) => {
   const result = Joi
     .object({
       email: Joi.string().email().presence("required"),
-      password: Joi.string().presence("required"),
+      password: Joi.string().min(8).max(30).presence("required"),
   })
     .required()
     .validate(user, { abortEarly: false })
@@ -28,8 +28,8 @@ const validateUserRegister = (user) => {
   const result = Joi
     .object({
       email: Joi.string().email().presence("required"),
-      password: Joi.string().presence("required"),
-      password2: Joi.string().presence("required"),
+      password: Joi.string().min(8).max(30).presence("required"),
+      password: Joi.string().min(8).max(30).presence("required"),
       pseudo: Joi.string().presence("required"),
   })
     .required()
