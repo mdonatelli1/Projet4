@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { AsyncStorage, StyleSheet, View } from 'react-native';
 
 import Home from "./pages/Home.jsx"
 import Login from "./pages/Login.jsx"
@@ -10,15 +10,45 @@ export default function App() {
   const [isAuth, setIsAuth] = useState(false);
   const [token, setToken] = useState("");
 
-  // useEffect(() => {
-  //   if (sessionStorage.getItem("isAuth") !== null) {
-  //     // Si la valeur de l'authentification est dans le stockage de session, alors on lui attribue sa valeur,
-  //     setIsAuth(JSON.parse(sessionStorage.getItem("isAuth")));
-  //   } else {
-  //     // sinon on ajoute la valeur par défaut 'false' dans le stockage de session
-  //     sessionStorage.setItem("isAuth", false);
-  //   }
-  // }, [])
+  _storeData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(
+        key,
+        value
+      );
+    } catch (error) {
+      // Error saving data
+    }
+  };
+  
+  _retrieveData = async (key) => {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      if (value !== null) {
+        // Return the value if it exists
+        return value;
+      }
+      return null; // Return null if the value doesn't exist
+    } catch (error) {
+      // Error retrieving data
+      return null; // Return null if an error occurs
+    }
+  };
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      const isAuthValue = await _retrieveData("isAuth");
+      if (isAuthValue !== null) {
+        // Si la valeur de l'authentification est dans le stockage de session, alors on lui attribue sa valeur,
+        setIsAuth(isAuthValue);
+      } else {
+        // sinon on ajoute la valeur par défaut 'false' dans le stockage de session
+        await _storeData("isAuth", false);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
   return (
     <View style={styles.main}>

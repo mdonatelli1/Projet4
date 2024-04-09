@@ -31,6 +31,7 @@ module.exports.setPost = async (req, res) => {
     const errors = validatePost(req.body);
 
     if (errors) {
+      console.log(errors)
       return res.status(401).send(errors);
     }
     // -------------

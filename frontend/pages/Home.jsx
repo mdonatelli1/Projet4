@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { useEffect, useRef, useState  } from 'react';
-import { AsyncStorage, Button, Image, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { AsyncStorage, Button, Image, ScrollView, StyleSheet, TextInput, TouchableHighlight, View } from 'react-native';
 
 import Message from "../components/Message.jsx";
 
-export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
+export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
   // msgContent contiendra le contenu du message à envoyer
   const [msgContent, setMsgContent] = useState("");
   // posts contiendra la totalité des posts
@@ -14,6 +14,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
   const [userData, setUserData] = useState({});
   const [handleEdit, setHandleEdit] = useState(false);
   const [idToModify, setIdToModify] = useState("");
+  const [reload, setReload] = useState(false);
 
   _storeData = async (key, value) => {
     try {
@@ -34,7 +35,9 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
         Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
       }
     })
-    .then((response) => setUserData(response.data))
+    .then((response) => {
+      setUserData(response.data);
+    })
     .catch((err) => {
       console.error(err);
 
@@ -53,7 +56,10 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
         Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
       }
     })
-    .then((response) => setPosts(response.data))  // et on les assigne à la state : posts
+    .then((response) => {
+      // et on les assigne à la state : posts
+      setPosts(response.data);
+    })
     .catch((err) => {
       console.error(err);
 
@@ -61,7 +67,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
       _storeData("isAuth", false);
       setIsAuth(false);
     });
-  }, []);
+  }, [reload]);
 
   // scrollToBottom
   useEffect(() => {
@@ -69,22 +75,8 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
   }, [posts])
   // --------------
 
-  _retrieveData = async (key) => {
-    try {
-      const value = await AsyncStorage.getItem(key);
-      if (value !== null) {
-        // We have data!!
-        console.log(value);
-      }
-    } catch (error) {
-      // Error retrieving data
-    }
-  };
-
   // handlePost permet de transmettre au BACK le message envoyé
-  const handlePost = () => {
-    const auth_token = _retrieveData("auth_token");
-
+  const handlePost = async () => {
       // On transmet le message envoyé au BACK
       axios
       .post("http://192.168.1.27:3000/posts",
@@ -97,9 +89,10 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
         }
-      }).then(() => {
-        // On recharge la page afin d'afficher le nouveau post
-        window.location.reload();
+      })
+      .then(() => {
+        setReload(!reload);
+        setMsgContent("");
       })
       .catch((err) => {
         console.error(err);
@@ -116,9 +109,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
     setMsgContent(postMessage);
   }
 
-  const handlePut = () => {
-    const auth_token = _retrieveData("auth_token");
-
+  const handlePut = async () => {
       axios
       .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
         message: msgContent,  // contenu du message
@@ -129,7 +120,11 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
         }
       })
       .then(() => {
-        window.location.reload();
+        setReload(!reload);
+
+        setHandleEdit(false);
+        setIdToModify("");
+        setMsgContent("");
       })
       .catch((err) => {
         console.warn(err.response.data.message);
@@ -140,9 +135,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
       });
   };
 
-  const handleDelete = (postId) => {
-    const auth_token = _retrieveData("auth_token");
-
+  const handleDelete = async (postId) => {
       axios
       .delete(`http://192.168.1.27:3000/posts/${postId}`, {
         headers: {
@@ -151,7 +144,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
         }
       })
       .then(() => {
-        window.location.reload();
+        setReload(!reload);
       })
       .catch((err) => {
         console.warn(err.response.data.message);
@@ -165,16 +158,20 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
   return (
     <View style={styles.container}>
       {/* "Bouton" de déconnexion */}
-      <Image
-        style={styles.logout}
-        onClick={() => {
+      <TouchableHighlight
+        style={styles.logoutContainer}
+        onPress={() => {
           // On déconnecte l'utilisateur
           _storeData("isAuth", false)
           setIsAuth(false);
         }}
-        source={require("../assets/images/logout.png")}
-        alt="logout"
-      />
+      >
+        <Image
+          style={styles.logout}
+          source={require("../assets/images/logout.png")}
+          alt="logout"
+        />
+      </TouchableHighlight>
       <ScrollView
         // scrollToBottom
         ref={scrollViewRef}
@@ -215,6 +212,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: "10%",
     paddingTop: "10%",
     height: "100%",
     width: "90%",
@@ -222,22 +220,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  logout: {
-    height: "32px",
-    width: "32px",
+  logoutContainer: {
     position: "absolute",
     top: 0,
     right: 0,
     // cursor: "pointer"
   },
+  logout: {
+    height: 32,
+    width: 32,
+  },
   messages: {
     flex: 1,
     width: "90%",
     marginBottom: "5%",
+    marginTop: "5%"
   },
   post: {
     width: "90%",
-    marginBottom: "5%",
+    marginBottom: "30%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between"
@@ -247,6 +248,6 @@ const styles = StyleSheet.create({
     color: "#1B1918",
     flex: 0.9,
     // borderRadius: "10px",
-    padding: "5px"
+    padding: 5
   }
 });

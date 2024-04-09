@@ -4,6 +4,8 @@ const validatePost = (post) => {
   const result = Joi
     .object({
       message: Joi.string().presence("required"),
+      authorId: Joi.string().presence("optional"),
+      authorPseudo: Joi.string().presence("optional"),
   })
     .required()
     .validate(post, { abortEarly: false })

@@ -27,21 +27,23 @@ export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
   };
 
   // handleConnect permet de se connecter
-  const handleConnect = () => {
-    axios
-      .post("http://192.168.1.27:3000/auth/login", {
-          email: formData.email,
-          password: formData.password
-        }, {
-        withCredentials: true,
-        credentials: 'include'
+  const handleConnect = async () => {
+    try {
+      const response = await axios.post("http://192.168.1.27:3000/auth/login", {
+        email: formData.email,
+        password: formData.password
       })
-      .then((response) => {
-        // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
-        _storeData("isAuth", true);
-        setIsAuth(true);
-      })
-      .catch((err) => setErrors(err.response.data))
+
+      // et on ajoute son pseudo au stockage de session
+      await _storeData("auth_token", response.data.token);
+      setToken(response.data.token);
+
+      // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
+      await _storeData("isAuth", true);
+      setIsAuth(true);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   // handleRegister permet de s'enregistrer
