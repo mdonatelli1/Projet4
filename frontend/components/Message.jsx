@@ -138,8 +138,8 @@ export default function Message({ post, userData, handleModif, handleDelete, isA
 
 const styles = StyleSheet.create({
   message: {
-    marginTop: 5,
-    marginBottom: 5,
+    marginTop: 8,
+    marginBottom: 8,
     position: "relative",
     width: "90%",
   },
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   messageContent: {
     backgroundColor: "#FFFFFF",
     border: "solid 1px #FF6C37",
-    // borderRadius: "10px",
+    borderRadius: 10,
     marginTop: 2.5,
     marginBottom: 2.5,
     padding: 10

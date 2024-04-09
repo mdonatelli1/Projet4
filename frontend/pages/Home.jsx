@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     color: "#1B1918",
     flex: 0.9,
-    // borderRadius: "10px",
+    borderRadius: 10,
     padding: 5
   }
 });
