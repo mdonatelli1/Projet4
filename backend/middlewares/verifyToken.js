@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken")
+const { decodeJWT } = require("../helpers/jwtHelper");
 
 const verifyToken = (req, res, next) => {
   try {
@@ -18,7 +18,7 @@ const verifyToken = (req, res, next) => {
 
     // Vérifier la validité du token (son authenticité et sa date d'expériation)
     // En cas de succès, le payload est extrait et décodé
-    req.auth = jwt.verify(token, process.env.TOKEN_SECRET);
+    req.auth = decodeJWT(token);
 
     next();
   } catch (err) {

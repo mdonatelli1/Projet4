@@ -18,14 +18,17 @@ export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
   // handleConnect permet de se connecter
   const handleConnect = () => {
     axios
-      .get("http://192.168.1.27:3000/auth/login", {
-        params: {
+      .post("http://192.168.1.27:3000/auth/login", {
           email: formData.email,
           password: formData.password
-        }
+        }, {
+        withCredentials: true,
+        credentials: 'include'
       })
       .then((response) => {
-        setToken(response.data.token);
+        // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
+        sessionStorage.setItem("isAuth", true);
+        setIsAuth(true);
 
         // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
         // sessionStorage.setItem("isAuth", true),
@@ -94,6 +97,7 @@ export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
           <Text style={styles.text}>Mot de passe</Text>
           <TextInput
             id="password"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password}
             onChangeText={(e) => {
@@ -137,6 +141,7 @@ export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
           <Text style={styles.text}>Mot de passe</Text>
           <TextInput
             id="password"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password}
             onChangeText={(e) => {
@@ -149,6 +154,7 @@ export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
           <Text style={styles.text}>Confirmer le mot de passe</Text>
           <TextInput
             id="password2"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password2}
             onChangeText={(e) => {

@@ -60,7 +60,8 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
 
   // handlePost permet de transmettre au BACK le message envoyé
   const handlePost = () => {
-    try {
+    const auth_token = sessionStorage.getItem("auth_token");
+
       // On transmet le message envoyé au BACK
       axios
       .post("http://192.168.1.27:3000/posts",
@@ -73,18 +74,17 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
         }
+      }).then(() => {
+        // On recharge la page afin d'afficher le nouveau post
+        window.location.reload();
       })
-      .catch((err) => console.error(err));
-    } catch (err) {
-      console.error(err);
+      .catch((err) => {
+        console.error(err);
 
-      // On déconnecte l'utilisateur
-      // sessionStorage.setItem("isAuth", false);
-      setIsAuth(false);
-    };
-
-    // On recharge la page afin d'afficher le nouveau post
-    window.location.reload();
+        // On déconnecte l'utilisateur
+        sessionStorage.setItem("isAuth", false);
+        setIsAuth(false);
+      });
   };
 
   const preEdit = (postId, postMessage) => {
@@ -94,7 +94,8 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
   }
 
   const handlePut = () => {
-    try {
+    const auth_token = sessionStorage.getItem("auth_token");
+
       axios
       .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
         message: msgContent,  // contenu du message
@@ -104,20 +105,21 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
           Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
         }
       })
-      .catch((err) => console.warn(err.response.data.message));
-    } catch (err) {
-      console.error(err);
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.warn(err.response.data.message);
 
-      // On déconnecte l'utilisateur
-      // sessionStorage.setItem("isAuth", false);
-      setIsAuth(false);
-    }
-    
-    window.location.reload();
+        // On déconnecte l'utilisateur
+        sessionStorage.setItem("isAuth", false);
+        setIsAuth(false);
+      });
   };
 
   const handleDelete = (postId) => {
-    try {
+    const auth_token = sessionStorage.getItem("auth_token");
+
       axios
       .delete(`http://192.168.1.27:3000/posts/${postId}`, {
         headers: {
@@ -125,16 +127,16 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
           Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
         }
       })
-      .catch((err) => console.warn(err.response.data.message));
-    } catch (err) {
-      console.error(err);
-
-      // On déconnecte l'utilisateur
-      // sessionStorage.setItem("isAuth", false);
-      setIsAuth(false);
-    }
-
-    window.location.reload();
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.warn(err.response.data.message);
+        
+        // On déconnecte l'utilisateur
+        sessionStorage.setItem("isAuth", false);
+        setIsAuth(false);
+      }); 
   };
 
   return (
