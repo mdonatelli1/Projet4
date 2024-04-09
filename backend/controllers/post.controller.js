@@ -1,4 +1,5 @@
-const PostModel = require('../models/post.model');
+const PostModel = require("../models/post.model");
+const { validatePost } = require("../validators/postValidator")
 
 module.exports.getPostById = async (req, res) => {
   try {
