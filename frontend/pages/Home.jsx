@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useRef, useState  } from 'react';
-import { Button, Image, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { AsyncStorage, Button, Image, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import Message from "../components/Message.jsx";
 
@@ -15,6 +15,17 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
   const [handleEdit, setHandleEdit] = useState(false);
   const [idToModify, setIdToModify] = useState("");
 
+  _storeData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(
+        key,
+        value
+      );
+    } catch (error) {
+      // Error saving data
+    }
+  };
+
   useEffect(() => {
   axios
     .get(`http://192.168.1.27:3000/users/me`, {
@@ -28,7 +39,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      // sessionStorage.setItem("isAuth", false);
+      _storeData("isAuth", false);
       setIsAuth(false);
     });
   }, []);
@@ -47,7 +58,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      // sessionStorage.setItem("isAuth", false);
+      _storeData("isAuth", false);
       setIsAuth(false);
     });
   }, []);
@@ -58,9 +69,21 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
   }, [posts])
   // --------------
 
+  _retrieveData = async (key) => {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      if (value !== null) {
+        // We have data!!
+        console.log(value);
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+  };
+
   // handlePost permet de transmettre au BACK le message envoyé
   const handlePost = () => {
-    const auth_token = sessionStorage.getItem("auth_token");
+    const auth_token = _retrieveData("auth_token");
 
       // On transmet le message envoyé au BACK
       axios
@@ -82,7 +105,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
         console.error(err);
 
         // On déconnecte l'utilisateur
-        sessionStorage.setItem("isAuth", false);
+        _storeData("isAuth", false);
         setIsAuth(false);
       });
   };
@@ -94,7 +117,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
   }
 
   const handlePut = () => {
-    const auth_token = sessionStorage.getItem("auth_token");
+    const auth_token = _retrieveData("auth_token");
 
       axios
       .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
@@ -112,13 +135,13 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
         console.warn(err.response.data.message);
 
         // On déconnecte l'utilisateur
-        sessionStorage.setItem("isAuth", false);
+        _storeData("isAuth", false);
         setIsAuth(false);
       });
   };
 
   const handleDelete = (postId) => {
-    const auth_token = sessionStorage.getItem("auth_token");
+    const auth_token = _retrieveData("auth_token");
 
       axios
       .delete(`http://192.168.1.27:3000/posts/${postId}`, {
@@ -134,7 +157,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
         console.warn(err.response.data.message);
         
         // On déconnecte l'utilisateur
-        sessionStorage.setItem("isAuth", false);
+        _storeData("isAuth", false);
         setIsAuth(false);
       }); 
   };
@@ -146,7 +169,7 @@ export default function App({ isAuth, setIsAuth, auth_token, setToken }) {
         style={styles.logout}
         onClick={() => {
           // On déconnecte l'utilisateur
-          // sessionStorage.setItem("isAuth", false)
+          _storeData("isAuth", false)
           setIsAuth(false);
         }}
         source={require("../assets/images/logout.png")}

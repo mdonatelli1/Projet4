@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { AsyncStorage, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
   // errors contiendra la totalité des erreurs du formulaire
@@ -15,6 +15,17 @@ export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
   // login contiendra 'connect' pour se connecter ou 'register' pour s'enregistrer
   const [login, setLogin] = useState("");
 
+  _storeData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(
+        key,
+        value
+      );
+    } catch (error) {
+      // Error saving data
+    }
+  };
+
   // handleConnect permet de se connecter
   const handleConnect = () => {
     axios
@@ -27,11 +38,7 @@ export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
       })
       .then((response) => {
         // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
-        sessionStorage.setItem("isAuth", true);
-        setIsAuth(true);
-
-        // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
-        // sessionStorage.setItem("isAuth", true),
+        _storeData("isAuth", true);
         setIsAuth(true);
       })
       .catch((err) => setErrors(err.response.data))
@@ -211,6 +218,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "#FFFFFF",
-    color: "#FFFFFF"
+    color: "#FFFFFF",
+    width: 159
   }
 });
