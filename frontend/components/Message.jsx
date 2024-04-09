@@ -16,19 +16,8 @@ export default function Message({ post, userData, handleModif, handleDelete, isA
     }
   }, [])
 
-  _storeData = async (key, value) => {
-    try {
-      await AsyncStorage.setItem(
-        key,
-        value
-      );
-    } catch (error) {
-      // Error saving data
-    }
-  };
-
   // handleFav permet de liker ou de disliker le post en fonction de la valeur de la state : fav
-  const handleFav = async () => {
+  const handleFav = () => {
     if (fav) {
       // Si le post est liké,
       axios
@@ -45,7 +34,6 @@ export default function Message({ post, userData, handleModif, handleDelete, isA
         console.error(err);
 
         // On déconnecte l'utilisateur
-        _storeData("isAuth", false);
         setIsAuth(false);
       })
     } else {
@@ -64,7 +52,6 @@ export default function Message({ post, userData, handleModif, handleDelete, isA
         console.error(err);
 
         // On déconnecte l'utilisateur
-        _storeData("isAuth", false);
         setIsAuth(false);
       })
     }

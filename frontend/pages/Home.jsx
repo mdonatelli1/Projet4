@@ -16,17 +16,6 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
   const [idToModify, setIdToModify] = useState("");
   const [reload, setReload] = useState(false);
 
-  _storeData = async (key, value) => {
-    try {
-      await AsyncStorage.setItem(
-        key,
-        value
-      );
-    } catch (error) {
-      // Error saving data
-    }
-  };
-
   useEffect(() => {
   axios
     .get(`http://192.168.1.27:3000/users/me`, {
@@ -42,7 +31,6 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      _storeData("isAuth", false);
       setIsAuth(false);
     });
   }, []);
@@ -64,7 +52,6 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      _storeData("isAuth", false);
       setIsAuth(false);
     });
   }, [reload]);
@@ -98,7 +85,6 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
         console.error(err);
 
         // On déconnecte l'utilisateur
-        _storeData("isAuth", false);
         setIsAuth(false);
       });
   };
@@ -130,7 +116,6 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
         console.warn(err.response.data.message);
 
         // On déconnecte l'utilisateur
-        _storeData("isAuth", false);
         setIsAuth(false);
       });
   };
@@ -150,7 +135,6 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
         console.warn(err.response.data.message);
         
         // On déconnecte l'utilisateur
-        _storeData("isAuth", false);
         setIsAuth(false);
       }); 
   };
@@ -162,7 +146,6 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
         style={styles.logoutContainer}
         onPress={() => {
           // On déconnecte l'utilisateur
-          _storeData("isAuth", false)
           setIsAuth(false);
         }}
       >

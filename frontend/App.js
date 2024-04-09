@@ -10,46 +10,6 @@ export default function App() {
   const [isAuth, setIsAuth] = useState(false);
   const [token, setToken] = useState("");
 
-  _storeData = async (key, value) => {
-    try {
-      await AsyncStorage.setItem(
-        key,
-        value
-      );
-    } catch (error) {
-      // Error saving data
-    }
-  };
-  
-  _retrieveData = async (key) => {
-    try {
-      const value = await AsyncStorage.getItem(key);
-      if (value !== null) {
-        // Return the value if it exists
-        return value;
-      }
-      return null; // Return null if the value doesn't exist
-    } catch (error) {
-      // Error retrieving data
-      return null; // Return null if an error occurs
-    }
-  };
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      const isAuthValue = await _retrieveData("isAuth");
-      if (isAuthValue !== null) {
-        // Si la valeur de l'authentification est dans le stockage de session, alors on lui attribue sa valeur,
-        setIsAuth(isAuthValue);
-      } else {
-        // sinon on ajoute la valeur par défaut 'false' dans le stockage de session
-        await _storeData("isAuth", false);
-      }
-    };
-  
-    fetchData();
-  }, []);
-
   return (
     <View style={styles.main}>
       {isAuth ? (
