@@ -1,11 +1,11 @@
+const dotenv = require('dotenv').config();
+
 const connectDB = require("./config/db");
 const express = require("express");
-const cors = require("cors");
+const router = require("./routes");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
-const { authorization } = require("./middlewares/auth");
-
-const dotenv = require('dotenv').config();
 const port = process.env.PORT;
 
 // Connexion à la DB
@@ -21,13 +21,21 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Routes
-app.use("/auth", require("./routes/auth.routes"));
-app.use(authorization);
-app.use("/posts", require("./routes/post.routes"));
-app.use("/users", require("./routes/user.routes"));
+app.get("/", (req, res) => {
+  res.status(200).send("L'API est connectée !");
+});
+
+app.use("/api", router);
+
+app.get("*", (req, res) => {
+  res.status(404).json({ message: "Not Found !" });
+});
 
 // Lancer le serveur
-app.listen(port, () => {
-  console.log("Le serveur a démarré au port " + port);
+app.listen(port, (err) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log("Le serveur a démarré au port " + port);
+  }
 });
