@@ -29,7 +29,7 @@ const validateUserRegister = (user) => {
     .object({
       email: Joi.string().email().presence("required"),
       password: Joi.string().min(8).max(30).presence("required"),
-      password: Joi.string().min(8).max(30).presence("required"),
+      password2: Joi.string().min(8).max(30).presence("required"),
       pseudo: Joi.string().presence("required"),
   })
     .required()

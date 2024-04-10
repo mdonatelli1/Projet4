@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { useEffect, useRef, useState  } from 'react';
-import { Button, Image, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { AsyncStorage, Button, Image, ScrollView, StyleSheet, TextInput, TouchableHighlight, View } from 'react-native';
 
 import Message from "../components/Message.jsx";
 
-export default function App({ isAuth, setIsAuth }) {
+export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
   // msgContent contiendra le contenu du message à envoyer
   const [msgContent, setMsgContent] = useState("");
   // posts contiendra la totalité des posts
@@ -14,30 +14,28 @@ export default function App({ isAuth, setIsAuth }) {
   const [userData, setUserData] = useState({});
   const [handleEdit, setHandleEdit] = useState(false);
   const [idToModify, setIdToModify] = useState("");
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
-    axios
+  axios
     .get(`http://192.168.1.27:3000/users/me`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
       }
     })
-    .then((response) => setUserData(response.data))
+    .then((response) => {
+      setUserData(response.data);
+    })
     .catch((err) => {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
       setIsAuth(false);
     });
   }, []);
 
   useEffect(() => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
     // On récupère la totalité des posts,
     axios
     .get("http://192.168.1.27:3000/posts", {
@@ -46,15 +44,17 @@ export default function App({ isAuth, setIsAuth }) {
         Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
       }
     })
-    .then((response) => setPosts(response.data))  // et on les assigne à la state : posts
+    .then((response) => {
+      // et on les assigne à la state : posts
+      setPosts(response.data);
+    })
     .catch((err) => {
       console.error(err);
 
       // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
       setIsAuth(false);
     });
-  }, []);
+  }, [reload]);
 
   // scrollToBottom
   useEffect(() => {
@@ -63,9 +63,7 @@ export default function App({ isAuth, setIsAuth }) {
   // --------------
 
   // handlePost permet de transmettre au BACK le message envoyé
-  const handlePost = () => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
+  const handlePost = async () => {
       // On transmet le message envoyé au BACK
       axios
       .post("http://192.168.1.27:3000/posts",
@@ -78,15 +76,15 @@ export default function App({ isAuth, setIsAuth }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
         }
-      }).then(() => {
-        // On recharge la page afin d'afficher le nouveau post
-        window.location.reload();
+      })
+      .then(() => {
+        setReload(!reload);
+        setMsgContent("");
       })
       .catch((err) => {
         console.error(err);
 
         // On déconnecte l'utilisateur
-        sessionStorage.setItem("isAuth", false);
         setIsAuth(false);
       });
   };
@@ -97,9 +95,7 @@ export default function App({ isAuth, setIsAuth }) {
     setMsgContent(postMessage);
   }
 
-  const handlePut = () => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
+  const handlePut = async () => {
       axios
       .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
         message: msgContent,  // contenu du message
@@ -110,20 +106,21 @@ export default function App({ isAuth, setIsAuth }) {
         }
       })
       .then(() => {
-        window.location.reload();
+        setReload(!reload);
+
+        setHandleEdit(false);
+        setIdToModify("");
+        setMsgContent("");
       })
       .catch((err) => {
         console.warn(err.response.data.message);
 
         // On déconnecte l'utilisateur
-        sessionStorage.setItem("isAuth", false);
         setIsAuth(false);
       });
   };
 
-  const handleDelete = (postId) => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
+  const handleDelete = async (postId) => {
       axios
       .delete(`http://192.168.1.27:3000/posts/${postId}`, {
         headers: {
@@ -132,13 +129,12 @@ export default function App({ isAuth, setIsAuth }) {
         }
       })
       .then(() => {
-        window.location.reload();
+        setReload(!reload);
       })
       .catch((err) => {
         console.warn(err.response.data.message);
         
         // On déconnecte l'utilisateur
-        sessionStorage.setItem("isAuth", false);
         setIsAuth(false);
       }); 
   };
@@ -146,16 +142,19 @@ export default function App({ isAuth, setIsAuth }) {
   return (
     <View style={styles.container}>
       {/* "Bouton" de déconnexion */}
-      <Image
-        style={styles.logout}
-        onClick={() => {
+      <TouchableHighlight
+        style={styles.logoutContainer}
+        onPress={() => {
           // On déconnecte l'utilisateur
-          sessionStorage.setItem("isAuth", false)
           setIsAuth(false);
         }}
-        source={require("../assets/images/logout.png")}
-        alt="logout"
-      />
+      >
+        <Image
+          style={styles.logout}
+          source={require("../assets/images/logout.png")}
+          alt="logout"
+        />
+      </TouchableHighlight>
       <ScrollView
         // scrollToBottom
         ref={scrollViewRef}
@@ -164,7 +163,7 @@ export default function App({ isAuth, setIsAuth }) {
       >
         {/* On affiche la totalité des posts */}
         {posts.map((message) => (
-          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} />
+          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} isAuth={isAuth} setIsAuth={setIsAuth} auth_token={auth_token} />
         ))}
       </ScrollView>
       {/* "Formulaire" de création d'un post */}
@@ -173,7 +172,7 @@ export default function App({ isAuth, setIsAuth }) {
           style={styles.input}
           // composant contrôlé
           value={msgContent}
-          onChange={(e) => setMsgContent(e.target.value)}
+          onChangeText={(e) => setMsgContent(e)}
           // ------------------
         />
         {!handleEdit ? (
@@ -196,6 +195,7 @@ export default function App({ isAuth, setIsAuth }) {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: "10%",
     paddingTop: "10%",
     height: "100%",
     width: "90%",
@@ -203,22 +203,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  logout: {
-    height: "32px",
-    width: "32px",
+  logoutContainer: {
     position: "absolute",
     top: 0,
     right: 0,
-    cursor: "pointer"
+    // cursor: "pointer"
+  },
+  logout: {
+    height: 32,
+    width: 32,
   },
   messages: {
     flex: 1,
     width: "90%",
     marginBottom: "5%",
+    marginTop: "5%"
   },
   post: {
     width: "90%",
-    marginBottom: "5%",
+    marginBottom: "30%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between"
@@ -227,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     color: "#1B1918",
     flex: 0.9,
-    borderRadius: "10px",
-    padding: "5px"
+    borderRadius: 10,
+    padding: 5
   }
 });
