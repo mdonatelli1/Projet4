@@ -7,7 +7,7 @@ import { AuthContext } from '../contexts/AuthProvider.jsx';
 import Message from "../components/Message.jsx";
 
 export default function Home() {
-  const {isAuth, setIsAuth} = useContext(AuthContext);
+  const {setIsAuth} = useContext(AuthContext);
   // msgContent contiendra le contenu du message à envoyer
   const [msgContent, setMsgContent] = useState("");
   // posts contiendra la totalité des posts
@@ -151,7 +151,7 @@ export default function Home() {
       >
         {/* On affiche la totalité des posts */}
         {posts.map((message) => (
-          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} isAuth={isAuth} setIsAuth={setIsAuth} />
+          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} />
         ))}
       </ScrollView>
       {/* "Formulaire" de création d'un post */}
