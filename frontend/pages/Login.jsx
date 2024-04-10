@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { AsyncStorage, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
   // errors contiendra la totalité des erreurs du formulaire

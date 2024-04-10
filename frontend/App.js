@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { AsyncStorage, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import Home from "./pages/Home.jsx"
 import Login from "./pages/Login.jsx"

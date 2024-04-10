@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useRef, useState  } from 'react';
-import { AsyncStorage, Button, Image, ScrollView, StyleSheet, TextInput, TouchableHighlight, View } from 'react-native';
+import { Button, Image, ScrollView, StyleSheet, TextInput, TouchableHighlight, View } from 'react-native';
 
 import Message from "../components/Message.jsx";
 
@@ -63,7 +63,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
   // --------------
 
   // handlePost permet de transmettre au BACK le message envoyé
-  const handlePost = async () => {
+  const handlePost = () => {
       // On transmet le message envoyé au BACK
       axios
       .post("http://192.168.1.27:3000/posts",
@@ -95,7 +95,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
     setMsgContent(postMessage);
   }
 
-  const handlePut = async () => {
+  const handlePut = () => {
       axios
       .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
         message: msgContent,  // contenu du message
@@ -120,7 +120,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
       });
   };
 
-  const handleDelete = async (postId) => {
+  const handleDelete = (postId) => {
       axios
       .delete(`http://192.168.1.27:3000/posts/${postId}`, {
         headers: {
