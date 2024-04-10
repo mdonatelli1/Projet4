@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
-export default function Message({ post, userData, handleModif, handleDelete, isAuth, setIsAuth, auth_token }) {
+export default function Message({ post, userData, handleModif, handleDelete, isAuth, setIsAuth }) {
   // const [deleted, setDeleted] = useState(false);
   // fav = true si le post est liké, sinon, fav = false
   const [fav, setFav] = useState(false);
@@ -21,13 +21,8 @@ export default function Message({ post, userData, handleModif, handleDelete, isA
     if (fav) {
       // Si le post est liké,
       axios
-      .patch(`http://192.168.1.27:3000/posts/dislike-post/${post._id}`, { // alors on le dislike,
-        userId: userData._id
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-        }
+      .patch(`http://192.168.1.27:3000/posts/dislike-post/${post._id}`, {
+        withCredentials: true,
       }).then(() => {
         setAmountLikes(amountLikes - 1);
       }).catch((err) => {
@@ -39,13 +34,8 @@ export default function Message({ post, userData, handleModif, handleDelete, isA
     } else {
       // sinon,
       axios
-      .patch(`http://192.168.1.27:3000/posts/like-post/${post._id}`, {  // on le like
-        userId: userData._id
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-        }
+      .patch(`http://192.168.1.27:3000/posts/like-post/${post._id}`, {
+        withCredentials: true,
       }).then(() => {
         setAmountLikes(amountLikes + 1);
       }).catch((err) => {
