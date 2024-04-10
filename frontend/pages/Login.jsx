@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
-export default function Login({ isAuth, setIsAuth }) {
+export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
   // errors contiendra la totalité des erreurs du formulaire
   const [errors, setErrors] = useState({});
   // Initialisation des données du formulaire
@@ -17,24 +17,17 @@ export default function Login({ isAuth, setIsAuth }) {
 
   // handleConnect permet de se connecter
   const handleConnect = () => {
-    axios
-      .get("http://192.168.1.27:3000/auth/login", {
-        params: {
-          email: formData.email,
-          password: formData.password
-        },
-        withCredentials: true,
-        credentials: 'include'
+      axios.post("http://192.168.1.27:3000/auth/login", {
+        email: formData.email,
+        password: formData.password
       })
       .then((response) => {
-        // Si la connexion a réussi, alors on connecte l'utilisateur à sa session,
-        sessionStorage.setItem("isAuth", true),
+        setToken(response.data.token);
         setIsAuth(true);
-
-        // et on ajoute son pseudo au stockage de session
-        sessionStorage.setItem("auth_token", response.data.token);
       })
-      .catch((err) => setErrors(err.response.data))
+      .catch((err) => {
+        console.error(err);
+      })
   }
 
   // handleRegister permet de s'enregistrer
@@ -87,14 +80,25 @@ export default function Login({ isAuth, setIsAuth }) {
             id="email"
             style={styles.input}
             value={formData.email}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  email: e,
+                }))
+            }}
           />
           <Text style={styles.text}>Mot de passe</Text>
           <TextInput
             id="password"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  password: e,
+                }))
+            }}
           />
           <Button
             color={"#FF6C37"}
@@ -120,28 +124,50 @@ export default function Login({ isAuth, setIsAuth }) {
             id="email"
             style={styles.input}
             value={formData.email}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  email: e,
+                }))
+            }}
           />
           <Text style={styles.text}>Mot de passe</Text>
           <TextInput
             id="password"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  password: e,
+                }))
+            }}
           />
           <Text style={styles.text}>Confirmer le mot de passe</Text>
           <TextInput
             id="password2"
+            secureTextEntry={true}
             style={styles.input}
             value={formData.password2}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  password2: e,
+                }))
+            }}
           />
           <Text style={styles.text}>Pseudo</Text>
           <TextInput
             id="pseudo"
             style={styles.input}
             value={formData.pseudo}
-            onChange={(e) => handleChange(e)}
+            onChangeText={(e) => {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  pseudo: e,
+                }))
+            }}
           />
           <Button
             color={"#FF6C37"}
@@ -170,7 +196,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "10px"
+    gap: 10
   },
   text: {
     color: "#FFFFFF"
@@ -178,6 +204,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "#FFFFFF",
-    color: "#FFFFFF"
+    color: "#FFFFFF",
+    width: 159
   }
 });

@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
-export default function Message({ post, userData, handleModif, handleDelete }) {
+export default function Message({ post, userData, handleModif, handleDelete, isAuth, setIsAuth, auth_token }) {
   // const [deleted, setDeleted] = useState(false);
   // fav = true si le post est liké, sinon, fav = false
   const [fav, setFav] = useState(false);
@@ -17,43 +17,43 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
   }, [])
 
   // handleFav permet de liker ou de disliker le post en fonction de la valeur de la state : fav
-  const handleFav = async () => {
-    const auth_token = sessionStorage.getItem("auth_token");
-
-    try {
-      if (fav) {
-        // Si le post est liké,
-        axios
-        .patch(`http://192.168.1.27:3000/posts/dislike-post/${post._id}`, { // alors on le dislike,
-          userId: userData._id
-        }, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-          }
-        })
-
+  const handleFav = () => {
+    if (fav) {
+      // Si le post est liké,
+      axios
+      .patch(`http://192.168.1.27:3000/posts/dislike-post/${post._id}`, { // alors on le dislike,
+        userId: userData._id
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
+        }
+      }).then(() => {
         setAmountLikes(amountLikes - 1);
-      } else {
-        // sinon,
-        axios
-        .patch(`http://192.168.1.27:3000/posts/like-post/${post._id}`, {  // on le like
-          userId: userData._id
-        }, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-          }
-        })
+      }).catch((err) => {
+        console.error(err);
 
+        // On déconnecte l'utilisateur
+        setIsAuth(false);
+      })
+    } else {
+      // sinon,
+      axios
+      .patch(`http://192.168.1.27:3000/posts/like-post/${post._id}`, {  // on le like
+        userId: userData._id
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
+        }
+      }).then(() => {
         setAmountLikes(amountLikes + 1);
-      }
-    } catch (err) {
-      console.error(err);
+      }).catch((err) => {
+        console.error(err);
 
-      // On déconnecte l'utilisateur
-      sessionStorage.setItem("isAuth", false);
-      setIsAuth(false);
+        // On déconnecte l'utilisateur
+        setIsAuth(false);
+      })
     }
 
     // On met à jour la state : fav
@@ -79,18 +79,26 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
         <Text style={styles.author}>{post.authorPseudo}</Text>
         {userData._id === post.authorId && (
           <>
-            <Image
-              style={styles.logo}
-              onClick={() => handleModif(post._id, post.message)}
-              source={require("../assets/images/Modif.png")}
-              alt="Modif"
-            />
-            <Image
-              style={styles.logo}
-              onClick={() => handleDelete(post._id)}
-              source={require("../assets/images/Delete.png")}
-              alt="Delete"
-            />
+            <TouchableHighlight
+              style={styles.logoContainer}
+              onPress={() => handleModif(post._id, post.message)}
+            >
+              <Image
+                style={styles.logo}
+                source={require("../assets/images/Modif.png")}
+                alt="Modif"
+              />
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={styles.logoContainer}
+              onPress={() => handleDelete(post._id)}
+            >
+              <Image
+                style={styles.logo}
+                source={require("../assets/images/Delete.png")}
+                alt="Delete"
+              />
+            </TouchableHighlight>
           </>
         )}
       </View>
@@ -99,20 +107,28 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
         <Text style={styles.likers}>{amountLikes}</Text>
         {fav ? (
           // Si le post est liké, alors on affiche le coeur plein,
-          <Image
-            style={styles.fav}
-            onClick={() => handleFav()}
-            source={require("../assets/images/heart-solid.png")}
-            alt="yesFav"
-          />
+          <TouchableHighlight
+            style={styles.favContainer}
+            onPress={() => handleFav()}
+          >
+            <Image
+              style={styles.fav}
+              source={require("../assets/images/heart-solid.png")}
+              alt="yesFav"
+            />
+          </TouchableHighlight>
         ) : (
           // sinon on affiche le coeur vide
-          <Image
-            style={styles.fav}
-            onClick={() => handleFav()}
-            source={require("../assets/images/heart-regular.png")}
-            alt="noFav"
-          />
+          <TouchableHighlight
+          style={styles.favContainer}
+            onPress={() => handleFav()}
+          >
+            <Image
+              style={styles.fav}
+              source={require("../assets/images/heart-regular.png")}
+              alt="noFav"
+            />
+          </TouchableHighlight>
         )}
       </View>
       <Text style={styles.datetime}>{changeDateFormat(post.createdAt)}</Text>
@@ -122,8 +138,8 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
 
 const styles = StyleSheet.create({
   message: {
-    marginTop: "5px",
-    marginBottom: "5px",
+    marginTop: 8,
+    marginBottom: 8,
     position: "relative",
     width: "90%",
   },
@@ -133,43 +149,47 @@ const styles = StyleSheet.create({
   messageHeader: {
     display: "flex",
     flexDirection: "row",
-    gap: "10px",
-    alignItems: "center"
+    gap: 10,
+    alignItems: "center",
   },
   author: {
-    fontSize: "0.75rem",
+    fontSize: 12,
     color: "#FF6C37"
   },
+  logoContainer: {
+    // cursor: "pointer"
+  },
   logo: {
-    height: "8px",
-    width: "8px",
-    cursor: "pointer"
+    height: 16,
+    width: 16,
   },
   messageContent: {
     backgroundColor: "#FFFFFF",
     border: "solid 1px #FF6C37",
-    borderRadius: "10px",
-    marginTop: "2.5px",
-    marginBottom: "2.5px",
-    padding: "10px"
+    borderRadius: 10,
+    marginTop: 2.5,
+    marginBottom: 2.5,
+    padding: 10
   },
   likers: {
     color: "#FF6C37",
     position: "absolute",
-    right: "32px",
+    right: 32,
     bottom: 0,
-    transform: "translate(50%, 100%)"
+    transform: [{ translateX: 16 }, { translateY: 16 }]
   },
-  fav: {
-    height: "16px",
-    width: "16px",
+  favContainer: {
     position: "absolute",
     right: 0,
     bottom: 0,
-    transform: "translate(50%, 50%)"
+    transform: [{ translateX: 8 }, { translateY: 8 }]
+  },
+  fav: {
+    height: 16,
+    width: 16,
   },
   datetime: {
-    fontSize: "0.5rem",
+    fontSize: 8,
     color: "#FF6C37"
   }
 });
