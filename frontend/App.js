@@ -1,25 +1,18 @@
-import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 
-import Home from "./pages/Home.jsx"
-import Login from "./pages/Login.jsx"
+import AuthProvider from './contexts/AuthProvider.jsx';
+
+import Router from "./Router";
 
 export default function App() {
-  // Initialisation de l'authentification
-  const [isAuth, setIsAuth] = useState(false);
-
   return (
-    <View style={styles.main}>
-      {isAuth ? (
-        // Si l'utilisateur est authentifié, alors on lui donne l'accès à sa session,
-        <Home isAuth={isAuth} setIsAuth={setIsAuth} />
-      ) : (
-        // sinon on lui propose de s'authentifier : connexion ou inscription
-        <Login isAuth={isAuth} setIsAuth={setIsAuth} />
-      )}
-      <StatusBar style="auto" />
-    </View>
+    <AuthProvider>
+      <View style={styles.main}>
+        <Router />
+        <StatusBar style="auto" />
+      </View>
+    </AuthProvider>
   );
 }
 
