@@ -21,8 +21,7 @@ export default function Login({ isAuth, setIsAuth }) {
         email: formData.email,
         password: formData.password
       }, {
-        withCredentials: true,
-        credentials: 'include'
+        withCredentials: true
       })
       .then(() => {
         setIsAuth(true);
