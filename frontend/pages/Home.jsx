@@ -1,10 +1,13 @@
 import axios from 'axios';
-import { useEffect, useRef, useState  } from 'react';
+import { useContext, useEffect, useRef, useState  } from 'react';
 import { Button, Image, ScrollView, StyleSheet, TextInput, TouchableHighlight, View } from 'react-native';
+
+import { AuthContext } from '../contexts/AuthProvider.jsx';
 
 import Message from "../components/Message.jsx";
 
-export default function Home({ isAuth, setIsAuth }) {
+export default function Home() {
+  const {isAuth, setIsAuth} = useContext(AuthContext);
   // msgContent contiendra le contenu du message à envoyer
   const [msgContent, setMsgContent] = useState("");
   // posts contiendra la totalité des posts

@@ -1,8 +1,11 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
-export default function Message({ post, userData, handleModif, handleDelete, isAuth, setIsAuth }) {
+import { AuthContext } from '../contexts/AuthProvider.jsx';
+
+export default function Message({ post, userData, handleModif, handleDelete }) {
+  const {setIsAuth} = useContext(AuthContext);
   // const [deleted, setDeleted] = useState(false);
   // fav = true si le post est liké, sinon, fav = false
   const [fav, setFav] = useState(false);

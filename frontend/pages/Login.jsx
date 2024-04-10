@@ -1,8 +1,11 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
-export default function Login({ isAuth, setIsAuth }) {
+import { AuthContext } from '../contexts/AuthProvider.jsx';
+
+export default function Login() {
+  const {setIsAuth} = useContext(AuthContext);
   // errors contiendra la totalité des erreurs du formulaire
   const [errors, setErrors] = useState({});
   // Initialisation des données du formulaire
