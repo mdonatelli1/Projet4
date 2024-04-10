@@ -4,7 +4,7 @@ import { Button, Image, ScrollView, StyleSheet, TextInput, TouchableHighlight, V
 
 import Message from "../components/Message.jsx";
 
-export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
+export default function Home({ isAuth, setIsAuth }) {
   // msgContent contiendra le contenu du message à envoyer
   const [msgContent, setMsgContent] = useState("");
   // posts contiendra la totalité des posts
@@ -19,10 +19,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
   useEffect(() => {
   axios
     .get(`http://192.168.1.27:3000/users/me`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-      }
+      withCredentials: true,
     })
     .then((response) => {
       setUserData(response.data);
@@ -39,10 +36,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
     // On récupère la totalité des posts,
     axios
     .get("http://192.168.1.27:3000/posts", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-      }
+      withCredentials: true,
     })
     .then((response) => {
       // et on les assigne à la state : posts
@@ -72,10 +66,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
         authorId: userData._id,  // id de l'auteur du message
         authorPseudo: userData.pseudo  // pseudo de l'auteur du message
       }, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-        }
+        withCredentials: true,
       })
       .then(() => {
         setReload(!reload);
@@ -100,10 +91,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
       .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
         message: msgContent,  // contenu du message
       }, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-        }
+        withCredentials: true,
       })
       .then(() => {
         setReload(!reload);
@@ -123,10 +111,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
   const handleDelete = (postId) => {
       axios
       .delete(`http://192.168.1.27:3000/posts/${postId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth_token}`, // Inclusion du jeton JWT
-        }
+        withCredentials: true,
       })
       .then(() => {
         setReload(!reload);
@@ -163,7 +148,7 @@ export default function Home({ isAuth, setIsAuth, auth_token, setToken }) {
       >
         {/* On affiche la totalité des posts */}
         {posts.map((message) => (
-          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} isAuth={isAuth} setIsAuth={setIsAuth} auth_token={auth_token} />
+          <Message key={message._id} post={message} userData={userData} handleModif={preEdit} handleDelete={handleDelete} isAuth={isAuth} setIsAuth={setIsAuth} />
         ))}
       </ScrollView>
       {/* "Formulaire" de création d'un post */}

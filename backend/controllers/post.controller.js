@@ -105,7 +105,7 @@ module.exports.likePost = async (req, res) => {
   try {
     await PostModel.findByIdAndUpdate(
       req.params.id,
-      {$addToSet: { likers: req.body.userId } },
+      {$addToSet: { likers: req.auth.user._id } },
       { new: true }
     )
 
@@ -119,7 +119,7 @@ module.exports.dislikePost = async (req, res) => {
   try {
     await PostModel.findByIdAndUpdate(
       req.params.id,
-      {$pull: { likers: req.body.userId } },
+      {$pull: { likers: req.auth.user._id } },
       { new: true }
     )
 

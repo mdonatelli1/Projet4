@@ -30,8 +30,8 @@ module.exports.loginUser = async (req, res) => {
 
   user.password = undefined;
   const token = encodeJWT({ user });
-  // res.cookie("auth_token", token, { httpOnly: true, secure: false });
-  res.status(200).json({ token: token, pseudo: user.pseudo, message: "La connexion a réussi" })
+  res.cookie("auth_token", `Bearer ${token}`, { httpOnly: true, secure: false });
+  res.status(200).json({ message: "La connexion a réussi" })
 };
 
 module.exports.registerUser = async (req, res) => {

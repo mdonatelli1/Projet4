@@ -1,9 +1,9 @@
 const { decodeJWT } = require("../helpers/jwtHelper");
 
-const verifyToken = (req, res, next) => {
+const authorization = (req, res, next) => {
   try {
     // Vérifier la présence de l'en-tête "Authorization" dans la requête
-    const authorizationHeader = req.get("Authorization");
+    const authorizationHeader = req.cookies.auth_token;
 
     if (authorizationHeader == null) {
       throw new Error("Authorization header is missing");
@@ -28,4 +28,4 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = { verifyToken };
+module.exports = { authorization };

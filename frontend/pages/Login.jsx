@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
-export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
+export default function Login({ isAuth, setIsAuth }) {
   // errors contiendra la totalité des erreurs du formulaire
   const [errors, setErrors] = useState({});
   // Initialisation des données du formulaire
@@ -20,9 +20,11 @@ export default function Login({ isAuth, setIsAuth, auth_token, setToken }) {
       axios.post("http://192.168.1.27:3000/auth/login", {
         email: formData.email,
         password: formData.password
+      }, {
+        withCredentials: true,
+        credentials: 'include'
       })
-      .then((response) => {
-        setToken(response.data.token);
+      .then(() => {
         setIsAuth(true);
       })
       .catch((err) => {
