@@ -20,7 +20,7 @@ export default function Login() {
 
   // handleConnect permet de se connecter
   const handleConnect = () => {
-      axios.post("http://192.168.1.27:3000/auth/login", {
+      axios.post("http://192.168.1.27:3000/api/auth/login", {
         email: formData.email,
         password: formData.password
       }, {
@@ -37,7 +37,7 @@ export default function Login() {
   // handleRegister permet de s'enregistrer
   const handleRegister = () => {
     axios
-      .post("http://192.168.1.27:3000/auth/register", {
+      .post("http://192.168.1.27:3000/api/auth/register", {
         email: formData.email,
         password: formData.password,
         password2: formData.password2,

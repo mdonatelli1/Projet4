@@ -21,7 +21,7 @@ export default function Home() {
 
   useEffect(() => {
   axios
-    .get(`http://192.168.1.27:3000/users/me`, {
+    .get(`http://192.168.1.27:3000/api/users/me`, {
       withCredentials: true,
     })
     .then((response) => {
@@ -38,7 +38,7 @@ export default function Home() {
   useEffect(() => {
     // On récupère la totalité des posts,
     axios
-    .get("http://192.168.1.27:3000/posts", {
+    .get("http://192.168.1.27:3000/api/posts", {
       withCredentials: true,
     })
     .then((response) => {
@@ -63,7 +63,7 @@ export default function Home() {
   const handlePost = () => {
       // On transmet le message envoyé au BACK
       axios
-      .post("http://192.168.1.27:3000/posts",
+      .post("http://192.168.1.27:3000/api/posts",
       {
         message: msgContent,  // contenu du message
         authorId: userData._id,  // id de l'auteur du message
@@ -91,7 +91,7 @@ export default function Home() {
 
   const handlePut = () => {
       axios
-      .put(`http://192.168.1.27:3000/posts/${idToModify}`, {
+      .put(`http://192.168.1.27:3000/api/posts/${idToModify}`, {
         message: msgContent,  // contenu du message
       }, {
         withCredentials: true,
@@ -113,7 +113,7 @@ export default function Home() {
 
   const handleDelete = (postId) => {
       axios
-      .delete(`http://192.168.1.27:3000/posts/${postId}`, {
+      .delete(`http://192.168.1.27:3000/api/posts/${postId}`, {
         withCredentials: true,
       })
       .then(() => {

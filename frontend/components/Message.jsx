@@ -24,7 +24,7 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
     if (fav) {
       // Si le post est liké,
       axios
-      .patch(`http://192.168.1.27:3000/posts/dislike-post/${post._id}`, {
+      .patch(`http://192.168.1.27:3000/api/posts/dislike-post/${post._id}`, {
         withCredentials: true,
       }).then(() => {
         setAmountLikes(amountLikes - 1);
@@ -37,7 +37,7 @@ export default function Message({ post, userData, handleModif, handleDelete }) {
     } else {
       // sinon,
       axios
-      .patch(`http://192.168.1.27:3000/posts/like-post/${post._id}`, {
+      .patch(`http://192.168.1.27:3000/api/posts/like-post/${post._id}`, {
         withCredentials: true,
       }).then(() => {
         setAmountLikes(amountLikes + 1);
